@@ -117,7 +117,10 @@ public class NewsTelegramBot extends TelegramLongPollingBot {
                 }
 
                 com.example.kurdish_news_bot.model.PostedNews savedNews = new com.example.kurdish_news_bot.model.PostedNews();
-                savedNews.setUrl(bestArticle.getUrl());
+                savedNews.setUrl(bestArticle.getUrl() + "-analysis");
+                savedNews.setTitle(" :شیکاری" + bestArticle.getTitle());
+                savedNews.setImageUrl(bestArticle.getImageUrl());
+                savedNews.setKurdishContent(formattedMessage);
                 repository.save(savedNews);
 
                 System.out.println("✅ هەواڵە شیکارییەکە بە دیزاینێکی جوانەوە نێردرا!");
@@ -206,7 +209,12 @@ public class NewsTelegramBot extends TelegramLongPollingBot {
                         photo.setParseMode("Markdown");
                         execute(photo);
                         com.example.kurdish_news_bot.model.PostedNews savedNews = new com.example.kurdish_news_bot.model.PostedNews();
+
                         savedNews.setUrl(article.getUrl());
+                        savedNews.setTitle(article.getTitle());
+                        savedNews.setImageUrl(article.getImageUrl());
+                        savedNews.setKurdishContent(fullMessage);
+
                         repository.save(savedNews);
                         System.out.println("✅ هەواڵێکی نوێ خەزن کرا لە داتابەیس.");
                         Thread.sleep(2000);
@@ -215,7 +223,12 @@ public class NewsTelegramBot extends TelegramLongPollingBot {
                         msg.setParseMode("Markdown");
                         execute(msg);
                         com.example.kurdish_news_bot.model.PostedNews savedNews = new com.example.kurdish_news_bot.model.PostedNews();
+
                         savedNews.setUrl(article.getUrl());
+                        savedNews.setTitle(article.getTitle());
+                        savedNews.setImageUrl(article.getImageUrl());
+                        savedNews.setKurdishContent(fullMessage);
+
                         repository.save(savedNews);
                         System.out.println("✅ هەواڵێکی نوێ خەزن کرا لە داتابەیس.");
                         Thread.sleep(2000);

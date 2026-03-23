@@ -14,16 +14,26 @@
       </ul>
     </aside>
     <main>
+      <header class="top-bar">
+        <div class="search-box">
+          <input type="text" placeholder="گەڕان بەدوای هەواڵ..." />
+          <button class="btn-search">گەڕان</button>
+        </div>
+        <div class="user-profile">
+          <span>ئەدمین</span>
+          <img
+            src="https://ui-avatars.com/api/?name=Admin&background=0145F2&color=fff"
+            alt="Admin Profile"
+          />
+        </div>
+      </header>
       <h1>دواین هەواڵەکان</h1>
       <div class="news-container">
-        <article>
-          <img src="https://picsum.photos/200/300" alt="" />
-          <h3>ئەمە ناونیشانی تاقی کردنەوەیە</h3>
-          <p>
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quibusdam
-            nam et vero reiciendis quidem impedit.
-          </p>
-          <a href="#" class="btn">درێژەی بابەت</a>
+        <article th:each="news : ${newsList}">
+          <img th:src="${news.imageUrl}" alt="News Image" />
+          <h3 th:text="${news.title}"></h3>
+          <p th:text="${news.kurdishContent}"></p>
+          <a th:href="${news.url}" class="btn">درێژەی بابەت</a>
         </article>
       </div>
     </main>
