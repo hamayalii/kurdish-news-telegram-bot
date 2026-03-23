@@ -3,6 +3,8 @@ package com.example.kurdish_news_bot.bot;
 import com.example.kurdish_news_bot.model.NewsArticle;
 import com.example.kurdish_news_bot.service.NewsProvider;
 import com.example.kurdish_news_bot.service.TranslationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,7 @@ import java.util.List;
 @Component
 public class NewsTelegramBot extends TelegramLongPollingBot {
 
+    private static final Logger log = LoggerFactory.getLogger(NewsTelegramBot.class);
     @Value("${telegram.bot.name}")
     private String botName;
 
@@ -68,6 +71,64 @@ public class NewsTelegramBot extends TelegramLongPollingBot {
     @Scheduled(cron = "0 0 9 * * *")
     public void broadcast(){
             List<NewsArticle> articles = newsProvider.fetchNews();
+
+        StringBuilder titlesList = new StringBuilder();
+
+        for (int i = 0; i < articles.size(); i++) {
+            titlesList.append(i)
+                    .append("- ")
+                    .append(articles.get(i).getTitle())
+                    .append("\n");
+        }
+
+        try {
+            int bestIndex = translationService.chooseMostImportantNews(titlesList.toString());
+
+            NewsArticle bestArticle = articles.get(bestIndex);
+
+            String rawAnalysis = translationService.analyzeNews(bestArticle.getFullContent());
+            try {
+
+                String formattedMessage = "🚨 *شیکاری گرنگترین هەواڵی کاتژمێر* 🚨\n\n"
+                        + rawAnalysis
+                        + "\n\n🤖 _ئەم شیکارییە لەلایەن زیرەکی دەستکردەوە ئامادە کراوە_";
+
+
+                if (bestArticle.getImageUrl() != null && !bestArticle.getImageUrl().isEmpty()) {
+                    SendPhoto photo = new SendPhoto();
+                    photo.setChatId(String.valueOf("@testt7393923"));
+                    photo.setPhoto(new InputFile(bestArticle.getImageUrl()));
+
+                    if (formattedMessage.length() < 1000){
+                        photo.setCaption(formattedMessage);
+                        photo.setParseMode("Markdown");
+                        execute(photo);
+                    }else {
+                        photo.setCaption("تەواوی شیکاریەکە لە خوارەوە بخوێنەرەوە👇🏻");
+                        execute(photo);
+                        SendMessage message = new SendMessage(String.valueOf("@testt7393923"), formattedMessage);
+                        message.setParseMode("Markdown");
+                        execute(message);
+                    }
+                } else {
+                    SendMessage msg = new SendMessage(String.valueOf("@testt7393923"), formattedMessage);
+                    msg.setParseMode("Markdown");
+                    execute(msg);
+                }
+
+                com.example.kurdish_news_bot.model.PostedNews savedNews = new com.example.kurdish_news_bot.model.PostedNews();
+                savedNews.setUrl(bestArticle.getUrl());
+                repository.save(savedNews);
+
+                System.out.println("✅ هەواڵە شیکارییەکە بە دیزاینێکی جوانەوە نێردرا!");
+
+            } catch (Exception e) {
+                System.out.println("❌ کێشە لە شیکاری و ناردنەکە: " + e.getMessage());
+            }
+
+        } catch (Exception e) {
+            System.out.println("کێشەیەک ڕوویدا لە شیکارییەکە: " + e.getMessage());
+        }
 
             for (int i = 0; i < Math.min(25, articles.size()); i++) {
                 NewsArticle article = articles.get(i);

@@ -1,0 +1,46 @@
+:root {
+    --bg-color: #EDF1F5
+    --primary-color: #0145F2
+    --card-bg: #c9e0f7
+}
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    height: 100vh;
+    background-color: var(--bg-color);
+}
+
+aside {
+    width: 250px;
+    background-color: var(--primary-color);
+}
+
+main {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.news-container {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+article {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+article img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
