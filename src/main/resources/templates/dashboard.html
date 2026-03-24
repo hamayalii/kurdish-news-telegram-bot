@@ -6,18 +6,57 @@
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
-    <aside>
-      <h2>سیستەمی شیکاری هەواڵ</h2>
-      <ul>
-        <li>سەرەتا</li>
-        <li>ئامارەکان</li>
-      </ul>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>سیستەمی شیکاری هەواڵ</h2>
+      </div>
+
+      <div class="stats-container">
+        <div class="stat-item">
+          <span class="stat-label">کۆی هەواڵەکان</span>
+          <span class="stat-value" th:text="${totalNews}">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">هەواڵەکانی ئەمڕۆ</span>
+          <span class="stat-value" th:text="${todayNews}">0</span>
+        </div>
+      </div>
+
+      <div class="source-list">
+        <h3>سەرچاوەکان</h3>
+        <ul>
+          <li><a href="/dashboard?source=BBC">BBC</a></li>
+          <li><a href="/dashboard?source=aljazera">Al Jazeera</a></li>
+          <li><a href="/dashboard?source=cnn">CNN</a></li>
+          <li><a href="/dashboard?source=rt">RT</a></li>
+          <li><a href="/dashboard?source=dw">DW</a></li>
+        </ul>
+      </div>
     </aside>
-    <main>
+
+    <main class="main-content">
       <header class="top-bar">
-        <div class="search-box">
-          <input type="text" placeholder="گەڕان بەدوای هەواڵ..." />
-          <button class="btn-search">گەڕان</button>
+        <div class="controls-container">
+          <form action="/dashboard." method="get" class="search-form">
+            <input
+              type="text"
+              name="query"
+              placeholder="گەڕان بەدوای هەواڵ..."
+            />
+            <button class="btn-search">گەڕان</button>
+          </form>
+
+          <form class="filter-form" action="/dashboard" method="get">
+            <select name="source">
+              <option value="">هەموو سەرچاوەکان</option>
+              <option value="BBC">BBC</option>
+              <option value="AlJazeera">Al Jazeera</option>
+              <option value="CNN">CNN</option>
+              <option value="RT">RT</option>
+              <option value="DW">DW</option>
+            </select>
+            <button type="submit" class="btn">فلتەر کردن</button>
+          </form>
         </div>
         <div class="user-profile">
           <span>ئەدمین</span>
@@ -28,13 +67,36 @@
         </div>
       </header>
       <h1>دواین هەواڵەکان</h1>
-      <div class="news-container">
-        <article th:each="news : ${newsList}">
-          <img th:src="${news.imageUrl}" alt="News Image" />
-          <h3 th:text="${news.title}"></h3>
-          <p th:text="${news.kurdishContent}"></p>
-          <a th:href="${news.url}" class="btn">درێژەی بابەت</a>
-        </article>
+      <div class="news-grid">
+        <div th:each="news, iterStat : ${newsList}" class="news-card">
+          <img
+            th:src="${news.imageUrl != null && !news.imageUrl.isEmpty() ? news.imageUrl : '/images/no-image.png'}"
+            alt="News Image"
+          />
+
+          <div class="news-card-body">
+            <h3 class="news-card-title" th:text="${news.title}">
+              ناونیشانی هەواڵ لێرە دەبێت
+            </h3>
+
+            <div class="news-content-wrapper">
+              <input
+                type="checkbox"
+                th:id="'toggle-' + ${iterStat.index}"
+                class="read-more-state"
+              />
+
+              <p class="news-card-description" th:text="${news.kurdishContent}">
+                دەقە کوردییەکە...
+              </p>
+
+              <label
+                th:for="'toggle-' + ${iterStat.index}"
+                class="read-more-trigger"
+              ></label>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   </body>

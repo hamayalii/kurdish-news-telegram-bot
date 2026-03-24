@@ -17,6 +17,8 @@ public class PostedNews {
     @Column(columnDefinition = "TEXT")
     private String kurdishContent;
 
+    private String sourceName;
+
     public PostedNews() {
     }
 
@@ -50,5 +52,13 @@ public class PostedNews {
 
     public void setKurdishContent(String kurdishContent) {
         this.kurdishContent = kurdishContent;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
     }
 }

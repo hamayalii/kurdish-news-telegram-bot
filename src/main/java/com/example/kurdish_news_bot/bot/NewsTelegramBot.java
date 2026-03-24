@@ -214,6 +214,7 @@ public class NewsTelegramBot extends TelegramLongPollingBot {
                         savedNews.setTitle(article.getTitle());
                         savedNews.setImageUrl(article.getImageUrl());
                         savedNews.setKurdishContent(fullMessage);
+                        savedNews.setSourceName(article.getUrl());
 
                         repository.save(savedNews);
                         System.out.println("✅ هەواڵێکی نوێ خەزن کرا لە داتابەیس.");
@@ -228,6 +229,7 @@ public class NewsTelegramBot extends TelegramLongPollingBot {
                         savedNews.setTitle(article.getTitle());
                         savedNews.setImageUrl(article.getImageUrl());
                         savedNews.setKurdishContent(fullMessage);
+                        savedNews.setSourceName(article.getUrl());
 
                         repository.save(savedNews);
                         System.out.println("✅ هەواڵێکی نوێ خەزن کرا لە داتابەیس.");
