@@ -17,8 +17,13 @@
           <span class="stat-value" th:text="${totalNews}">0</span>
         </div>
         <div class="stat-item">
-          <span class="stat-label">هەواڵەکانی ئەمڕۆ</span>
-          <span class="stat-value" th:text="${todayNews}">0</span>
+          <a
+            href="/dashboard?today=true"
+            style="text-decoration: none; color: inherit"
+          >
+            <span class="stat-label">هەواڵەکانی ئەمڕۆ</span>
+            <span class="stat-value" th:text="${todayNews}">0</span>
+          </a>
         </div>
       </div>
 
@@ -26,10 +31,10 @@
         <h3>سەرچاوەکان</h3>
         <ul>
           <li><a href="/dashboard?source=BBC">BBC</a></li>
-          <li><a href="/dashboard?source=aljazera">Al Jazeera</a></li>
-          <li><a href="/dashboard?source=cnn">CNN</a></li>
-          <li><a href="/dashboard?source=rt">RT</a></li>
-          <li><a href="/dashboard?source=dw">DW</a></li>
+          <li><a href="/dashboard?source=AlJazeera">Al Jazeera</a></li>
+          <li><a href="/dashboard?source=CNN">CNN</a></li>
+          <li><a href="/dashboard?source=RT">RT</a></li>
+          <li><a href="/dashboard?source=DW">DW</a></li>
         </ul>
       </div>
     </aside>

@@ -57,7 +57,7 @@ public class NewsTelegramBot extends TelegramLongPollingBot {
                 }
 
                 new Thread(() -> {
-                        broadcast();
+                    broadcast();
                 }).start();
             }
         }
@@ -68,9 +68,19 @@ public class NewsTelegramBot extends TelegramLongPollingBot {
         return botName;
     }
 
+    private String getSourceName(String url) {
+        if (url.contains("bbc.co")) return "BBC";
+        if (url.contains("aljazeera")) return "AlJazeera";
+        if (url.contains("cnn.com")) return "CNN";
+        if (url.contains("dw.com")) return "DW";
+        if (url.contains("rt.com")) return "RT";
+        if (url.contains("rudaw.net")) return "Rudaw";
+        return "Other";
+    }
+
     @Scheduled(cron = "0 0 9 * * *")
     public void broadcast(){
-            List<NewsArticle> articles = newsProvider.fetchNews();
+        List<NewsArticle> articles = newsProvider.fetchNews();
 
         StringBuilder titlesList = new StringBuilder();
 
@@ -133,112 +143,111 @@ public class NewsTelegramBot extends TelegramLongPollingBot {
             System.out.println("کێشەیەک ڕوویدا لە شیکارییەکە: " + e.getMessage());
         }
 
-            for (int i = 0; i < Math.min(25, articles.size()); i++) {
-                NewsArticle article = articles.get(i);
+        for (int i = 0; i < Math.min(25, articles.size()); i++) {
+            NewsArticle article = articles.get(i);
 
-                if (repository.existsById(article.getUrl())){
-                    System.out.println("⚠️ ئەم هەواڵە پێشتر پۆست کراوە: " + article.getTitle());
-                    continue;
-                }
+            if (repository.existsById(article.getUrl())){
+                System.out.println("⚠️ ئەم هەواڵە پێشتر پۆست کراوە: " + article.getTitle());
+                continue;
+            }
 
-                String linkToCheck = article.getUrl().toLowerCase();
-                String titleToCheck = article.getTitle().toLowerCase();
+            String linkToCheck = article.getUrl().toLowerCase();
+            String titleToCheck = article.getTitle().toLowerCase();
 
-                boolean isSportNews = linkToCheck.contains("sport") ||
-                        linkToCheck.contains("رياضة") ||
-                        titleToCheck.contains("sport") ||
-                        titleToCheck.contains("football") ||
-                        titleToCheck.contains("soccer") ||
-                        titleToCheck.contains("مێسی") ||
-                        titleToCheck.contains("رۆناڵدۆ") ||
-                        titleToCheck.contains("basketball") ||
-                        titleToCheck.contains("hockey") ||
-                        titleToCheck.contains("fifa");
+            boolean isSportNews = linkToCheck.contains("sport") ||
+                    linkToCheck.contains("رياضة") ||
+                    titleToCheck.contains("sport") ||
+                    titleToCheck.contains("football") ||
+                    titleToCheck.contains("soccer") ||
+                    titleToCheck.contains("مێسی") ||
+                    titleToCheck.contains("رۆناڵدۆ") ||
+                    titleToCheck.contains("basketball") ||
+                    titleToCheck.contains("hockey") ||
+                    titleToCheck.contains("fifa");
 
-                if (isSportNews){
-                    System.out.println("⚽ هەواڵێکی وەرزشی پشتگوێ خرا: " + article.getTitle());
-                    continue;
-                }
+            if (isSportNews){
+                System.out.println("⚽ هەواڵێکی وەرزشی پشتگوێ خرا: " + article.getTitle());
+                continue;
+            }
 
-                String kurdishTitle;
-                String kurdishDesc;
+            String kurdishTitle;
+            String kurdishDesc;
 
-                if (article.getUrl().contains("rudaw.net")){
-                    kurdishTitle = article.getTitle();
-                    kurdishDesc = article.getFullContent();
-                }else {
-                    kurdishTitle = translationService.translateToKurdish(article.getTitle());
-                    kurdishDesc = translationService.translateToKurdish(article.getFullContent());
-                }
-                String fullMessage = "📰 *" + kurdishTitle + "*\n\n📝 " + kurdishDesc + "\n\n🔗 [بۆ خوێندنەوەی تەواوی بابەتەکە کلیک لێرە بکە](" + article.getUrl() + ")";
+            if (article.getUrl().contains("rudaw.net")){
+                kurdishTitle = article.getTitle();
+                kurdishDesc = article.getFullContent();
+            }else {
+                kurdishTitle = translationService.translateToKurdish(article.getTitle());
+                kurdishDesc = translationService.translateToKurdish(article.getFullContent());
+            }
+            String fullMessage = "📰 *" + kurdishTitle + "*\n\n📝 " + kurdishDesc + "\n\n🔗 [بۆ خوێندنەوەی تەواوی بابەتەکە کلیک لێرە بکە](" + article.getUrl() + ")";
 
-                try {
-                    if (article.getImageUrl() != null && !article.getImageUrl().isEmpty()) {
-                        org.telegram.telegrambots.meta.api.methods.send.SendPhoto photo = new org.telegram.telegrambots.meta.api.methods.send.SendPhoto();
-                        photo.setChatId(String.valueOf("@testt7393923"));
+            try {
+                if (article.getImageUrl() != null && !article.getImageUrl().isEmpty()) {
+                    org.telegram.telegrambots.meta.api.methods.send.SendPhoto photo = new org.telegram.telegrambots.meta.api.methods.send.SendPhoto();
+                    photo.setChatId(String.valueOf("@testt7393923"));
 
-                        try {
-                            java.net.URL url = new java.net.URL(article.getImageUrl());
-                            java.net.URLConnection connection = url.openConnection();
-                            connection.setConnectTimeout(5000);
-                            connection.setReadTimeout(5000);
-                            connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+                    try {
+                        java.net.URL url = new java.net.URL(article.getImageUrl());
+                        java.net.URLConnection connection = url.openConnection();
+                        connection.setConnectTimeout(5000);
+                        connection.setReadTimeout(5000);
+                        connection.setRequestProperty("User-Agent", "Mozilla/5.0");
 
-                            java.io.InputStream imageStream = connection.getInputStream();
-                            photo.setPhoto(new org.telegram.telegrambots.meta.api.objects.InputFile(imageStream, "news_image.jpg"));
-                        } catch (Exception e) {
-                            System.out.println("کێشە لە داونلۆدی وێنە: " + e.getMessage());
-                            photo.setPhoto(new org.telegram.telegrambots.meta.api.objects.InputFile(article.getImageUrl()));
-                        }
-
-                        if (fullMessage.length() > 1000){
-
-                            int lastDot = fullMessage.lastIndexOf(".", 1000);
-                            int lastSpace = fullMessage.lastIndexOf(" ",1000);
-                            int lastComma = fullMessage.lastIndexOf("،",1000);
-
-                            if(lastDot != -1 && lastDot > 900){
-                                fullMessage = fullMessage.substring(0,(lastDot + 1));
-                            }else if(lastComma != -1 && lastComma > 900){
-                                fullMessage = fullMessage.substring(0, lastComma);
-                            }else{
-                                fullMessage = fullMessage.substring(0, lastSpace) + "...";
-                            }
-                        }
-                        photo.setCaption(fullMessage);
-                        photo.setParseMode("Markdown");
-                        execute(photo);
-                        com.example.kurdish_news_bot.model.PostedNews savedNews = new com.example.kurdish_news_bot.model.PostedNews();
-
-                        savedNews.setUrl(article.getUrl());
-                        savedNews.setTitle(article.getTitle());
-                        savedNews.setImageUrl(article.getImageUrl());
-                        savedNews.setKurdishContent(fullMessage);
-                        savedNews.setSourceName(article.getUrl());
-
-                        repository.save(savedNews);
-                        System.out.println("✅ هەواڵێکی نوێ خەزن کرا لە داتابەیس.");
-                        Thread.sleep(2000);
-                    } else {
-                        SendMessage msg = new SendMessage(String.valueOf("@testt7393923"), fullMessage);
-                        msg.setParseMode("Markdown");
-                        execute(msg);
-                        com.example.kurdish_news_bot.model.PostedNews savedNews = new com.example.kurdish_news_bot.model.PostedNews();
-
-                        savedNews.setUrl(article.getUrl());
-                        savedNews.setTitle(article.getTitle());
-                        savedNews.setImageUrl(article.getImageUrl());
-                        savedNews.setKurdishContent(fullMessage);
-                        savedNews.setSourceName(article.getUrl());
-
-                        repository.save(savedNews);
-                        System.out.println("✅ هەواڵێکی نوێ خەزن کرا لە داتابەیس.");
-                        Thread.sleep(2000);
+                        java.io.InputStream imageStream = connection.getInputStream();
+                        photo.setPhoto(new org.telegram.telegrambots.meta.api.objects.InputFile(imageStream, "news_image.jpg"));
+                    } catch (Exception e) {
+                        System.out.println("کێشە لە داونلۆدی وێنە: " + e.getMessage());
+                        photo.setPhoto(new org.telegram.telegrambots.meta.api.objects.InputFile(article.getImageUrl()));
                     }
-                } catch (Exception e) {
-                    System.out.println("❌ کێشە لە ناردنی هەواڵ بۆ تێلیگرام: " + e.getMessage());
+
+                    if (fullMessage.length() > 1000){
+
+                        int lastDot = fullMessage.lastIndexOf(".", 1000);
+                        int lastSpace = fullMessage.lastIndexOf(" ",1000);
+                        int lastComma = fullMessage.lastIndexOf("،",1000);
+
+                        if(lastDot != -1 && lastDot > 900){
+                            fullMessage = fullMessage.substring(0,(lastDot + 1));
+                        }else if(lastComma != -1 && lastComma > 900){
+                            fullMessage = fullMessage.substring(0, lastComma);
+                        }else{
+                            fullMessage = fullMessage.substring(0, lastSpace) + "...";
+                        }
+                    }
+                    photo.setCaption(fullMessage);
+                    photo.setParseMode("Markdown");
+                    execute(photo);
+                    com.example.kurdish_news_bot.model.PostedNews savedNews = new com.example.kurdish_news_bot.model.PostedNews();
+
+                    savedNews.setUrl(article.getUrl());
+                    savedNews.setTitle(article.getTitle());
+                    savedNews.setImageUrl(article.getImageUrl());
+                    savedNews.setKurdishContent(fullMessage);
+                    savedNews.setSourceName(getSourceName(article.getUrl()));
+
+                    repository.save(savedNews);
+                    System.out.println("✅ هەواڵێکی نوێ خەزن کرا لە داتابەیس.");
+                    Thread.sleep(2000);
+                } else {
+                    SendMessage msg = new SendMessage(String.valueOf("@testt7393923"), fullMessage);
+                    msg.setParseMode("Markdown");
+                    execute(msg);
+                    com.example.kurdish_news_bot.model.PostedNews savedNews = new com.example.kurdish_news_bot.model.PostedNews();
+
+                    savedNews.setUrl(article.getUrl());
+                    savedNews.setTitle(article.getTitle());
+                    savedNews.setImageUrl(article.getImageUrl());
+                    savedNews.setKurdishContent(fullMessage);
+                    savedNews.setSourceName(getSourceName(article.getUrl()));
+
+                    repository.save(savedNews);
+                    System.out.println("✅ هەواڵێکی نوێ خەزن کرا لە داتابەیس.");
+                    Thread.sleep(2000);
                 }
+            } catch (Exception e) {
+                System.out.println("❌ کێشە لە ناردنی هەواڵ بۆ تێلیگرام: " + e.getMessage());
             }
         }
     }
-
+}

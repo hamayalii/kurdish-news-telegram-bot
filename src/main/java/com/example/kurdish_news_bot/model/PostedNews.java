@@ -3,6 +3,7 @@ package com.example.kurdish_news_bot.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import java.time.LocalDate;
 
 @Entity
 public class PostedNews {
@@ -19,7 +20,10 @@ public class PostedNews {
 
     private String sourceName;
 
+    private LocalDate postedAt;
+
     public PostedNews() {
+        this.postedAt = LocalDate.now();
     }
 
     public String getUrl() {
@@ -60,5 +64,13 @@ public class PostedNews {
 
     public void setSourceName(String sourceName) {
         this.sourceName = sourceName;
+    }
+
+    public java.time.LocalDate getPostedAt() {
+        return postedAt;
+    }
+
+    public void setPostedAt(java.time.LocalDate postedAt) {
+        this.postedAt = postedAt;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -18,25 +19,26 @@ public class DashboardController{
     Repository repository;
 
     @GetMapping("/dashboard")
-    public String showDashboard(Model model, @RequestParam(required = false) String source){
+    public String showDashboard(Model model, @RequestParam(required = false) String source,
+                                @RequestParam(required = false) Boolean today){
 
         List<PostedNews> allNews;
 
-        if(source != null && !source.trim().isEmpty()){
+        if (Boolean.TRUE.equals(today)) {
+            allNews = repository.findByPostedAt(LocalDate.now());
+        } else if (source != null && !source.trim().isEmpty()) {
             allNews = repository.findBySourceName(source);
-        }else {
+        } else {
             allNews = repository.findAll();
         }
 
         model.addAttribute("newsList", allNews);
 
-
         long totalNewsCount = repository.count();
+        long todayNewsCount = repository.countByPostedAt(LocalDate.now());
 
         model.addAttribute("totalNews", totalNewsCount);
-
-        model.addAttribute("todayNews", 5);
-
+        model.addAttribute("todayNews", todayNewsCount);
 
         return "dashboard";
     }
