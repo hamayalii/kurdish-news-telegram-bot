@@ -14,11 +14,11 @@ import java.util.Map;
 @Service
 public class TranslationService {
 
-    @Value("${cohere.api.key}")
+    @Value("${gemma.api.key}")
     private String apiKey;
 
     private final RestTemplate restTemplate;
-    private final String COHERE_API_URL = "https://api.cohere.ai/v1/chat";
+    private final String GEMMA_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
     public TranslationService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -36,7 +36,7 @@ public class TranslationService {
             headers.set("Accept", "application/json");
 
             Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("model", "command-a-03-2025");
+            requestBody.put("model", "gemma-4");
             requestBody.put("message", textToTranslate);
 
             String prompt = "You are an expert professional news translator. Your task is to translate the provided text from its original language (whether English, Russian, Arabic, or any other) into highly accurate Central Kurdish (Sorani) using the standard Kurdish-Arabic script. \n" +
@@ -52,7 +52,7 @@ public class TranslationService {
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
             ResponseEntity<Map> response = restTemplate.exchange(
-                    COHERE_API_URL, HttpMethod.POST, entity, Map.class);
+                    GEMMA_API_URL, HttpMethod.POST, entity, Map.class);
 
             Map<String, Object> responseBody = response.getBody();
             if (responseBody != null && responseBody.containsKey("text")) {
@@ -60,7 +60,7 @@ public class TranslationService {
             }
 
         } catch (Exception e) {
-            System.out.println("❌ کێشە لە وەرگێڕانی Cohere: " + e.getMessage());
+            System.out.println("❌ کێشە لە وەرگێڕانی Gemma 4: " + e.getMessage());
         }
 
         return textToTranslate;
@@ -74,7 +74,7 @@ public class TranslationService {
             headers.set("Accept", "application/json");
 
             Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("model", "command-a-03-2025");
+            requestBody.put("model", "gemma-4");
 
             requestBody.put("message", numberedTitles);
 
@@ -83,7 +83,7 @@ public class TranslationService {
             requestBody.put("temperature", 0.1);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<Map> response = restTemplate.exchange(COHERE_API_URL, HttpMethod.POST, entity, Map.class);
+            ResponseEntity<Map> response = restTemplate.exchange(GEMMA_API_URL, HttpMethod.POST, entity, Map.class);
 
             Map<String, Object> responseBody = response.getBody();
             if (responseBody != null && responseBody.containsKey("text")) {
@@ -93,7 +93,7 @@ public class TranslationService {
             }
 
         } catch (Exception e) {
-            System.out.println("❌ کێشە لە هەڵبژاردنی هەواڵ لە کۆهێر: " + e.getMessage());
+            System.out.println("❌ کێشە لە هەڵبژاردنی هەواڵ لە Gemma 4: " + e.getMessage());
         }
 
         return 0;
@@ -107,7 +107,7 @@ public class TranslationService {
             headers.set("Accept", "application/json");
 
             Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("model", "command-a-03-2025");
+            requestBody.put("model", "gemma-4");
 
             requestBody.put("message", fullContent);
 
@@ -115,7 +115,7 @@ public class TranslationService {
             requestBody.put("preamble", prompt);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<Map> response = restTemplate.exchange(COHERE_API_URL, HttpMethod.POST, entity, Map.class);
+            ResponseEntity<Map> response = restTemplate.exchange(GEMMA_API_URL, HttpMethod.POST, entity, Map.class);
 
             Map<String, Object> responseBody = response.getBody();
             if (responseBody != null && responseBody.containsKey("text")) {
@@ -123,7 +123,7 @@ public class TranslationService {
             }
 
         } catch (Exception e) {
-            System.out.println("❌ کێشە لە شیکاری Cohere: " + e.getMessage());
+            System.out.println("❌ کێشە لە شیکاری Gemma 4: " + e.getMessage());
         }
         return "";
     }

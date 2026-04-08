@@ -14,8 +14,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.io.InputStream;
-import java.net.URL;
+
 import java.util.List;
 
 @Component
@@ -49,7 +48,7 @@ public class NewsTelegramBot extends TelegramLongPollingBot {
 
                 System.out.println("✅ فەرمانی news وەرگیرا، ئێستا دەست دەکەم بە هێنانی هەواڵ...");
 
-                SendMessage waitMessage = new SendMessage(String.valueOf(chatId), "⏳ خەریکی هێنان و وەرگێڕانی تازەترین هەواڵەکانم لە ڕێگەی Cohere AI، تکایە چەند چرکەیەک چاوەڕێ بکە...");
+                SendMessage waitMessage = new SendMessage(String.valueOf(chatId), "⏳ خەریکی هێنان و وەرگێڕانی تازەترین هەواڵەکانم لە ڕێگەی Gemma 4، تکایە چەند چرکەیەک چاوەڕێ بکە...");
                 try {
                     execute(waitMessage);
                 } catch (Exception e) {
@@ -127,8 +126,8 @@ public class NewsTelegramBot extends TelegramLongPollingBot {
                 }
 
                 com.example.kurdish_news_bot.model.PostedNews savedNews = new com.example.kurdish_news_bot.model.PostedNews();
-                savedNews.setUrl(bestArticle.getUrl() + "-analysis");
-                savedNews.setTitle(" :شیکاری" + bestArticle.getTitle());
+                savedNews.setUrl(bestArticle.getUrl());
+                savedNews.setTitle("\n :شیکاری" + bestArticle.getTitle());
                 savedNews.setImageUrl(bestArticle.getImageUrl());
                 savedNews.setKurdishContent(formattedMessage);
                 repository.save(savedNews);

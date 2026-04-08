@@ -35,20 +35,6 @@ public class KurdishNewsBotApplication implements CommandLineRunner{
     }
 
     @Bean
-    public CommandLineRunner run(TranslationService translationService) {
-        return args -> {
-            System.out.println("--------- دەستپێکردنی تاقیکردنەوەی Groq ---------");
-
-            String englishText = "Hello my friend! I am very happy that the code is finally working.";
-            System.out.println("دەقی ئینگلیزی: " + englishText);
-
-            String kurdishText = translationService.translateToKurdish(englishText);
-            System.out.println("وەرگێڕانی کوردی: " + kurdishText);
-
-            System.out.println("-------------------------------------------------");
-        };
-    }
-    @Bean
     public TelegramBotsApi telegramBotsApi(NewsTelegramBot bot) throws Exception {
         TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
         api.registerBot(bot);
